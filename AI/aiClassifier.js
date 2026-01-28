@@ -102,18 +102,73 @@ class AIClassifier {
      * Returns AI response in strict format
      */
     async classify(filename, metadata = {}, folderExists = true) {
-        const documentType = this.classifyDocumentType(filename);
-        const studentId = metadata.studentId || this.extractStudentId(filename, metadata);
+        // Fallback or Pre-calculation using RegEx (can be used as context)
+        const fallbackDocType = this.classifyDocumentType(filename);
+        const fallbackStudentId = metadata.studentId || this.extractStudentId(filename, metadata);
 
-        if (!studentId) {
-            return 'ERROR: NO_STUDENT_ID';
+        try {
+            if (!process.env.GEMINI_API_KEY) {
+                console.log('Gemini API Key missing, using Regex fallback.');
+                throw new Error('No API Key');
+            }
+
+            const { GoogleGenerativeAI } = require("@google/generative-ai");
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const studentId = metadata.studentId || fallbackStudentId || "UNKNOWN";
+
+            const prompt = `
+            You are a strict Classification AI for a College Management System.
+            
+            TASK:
+            1. Analyze the filename: "${filename}"
+            2. Determine the Document Type from these options: [assignment, idCard, certificate, feeReceipt]. Default to 'assignment' if unsure.
+            3. Confirm the Student ID provided: "${studentId}". If filename contains a different ID, prioritize the filename's ID.
+            
+            CONTEXT:
+            - Folder Exists: ${folderExists}
+            
+            OUTPUT FORMAT (Strict String):
+            If folder exists:
+            STORE: {studentId} → {documentType}
+
+            If folder missing (Context says folderExists: false):
+            CREATE_FOLDER: {studentId}
+            THEN_STORE: {documentType}
+
+            EXAMPLES:
+            - "ST102_Math_HW.pdf", folderExists=true -> STORE: ST102 → assignment
+            - "Fee_Receipt_Jan.pdf", ID="ST105", folderExists=false -> CREATE_FOLDER: ST105\nTHEN_STORE: feeReceipt
+            
+            Do not provide explanations. Only return the string format.
+            `;
+
+            const result = await model.generateContent(prompt);
+            const response = result.response.text().trim();
+            console.log('Gemini Response:', response);
+
+            // Basic validation of response format
+            if (response.includes('STORE:') || response.includes('CREATE_FOLDER:')) {
+                return response;
+            } else {
+                throw new Error('Invalid AI response format');
+            }
+
+        } catch (error) {
+            console.error('AI Classification Failed (Using Fallback):', error.message);
+            // Fallback logic
+            const studentId = fallbackStudentId;
+            if (!studentId) {
+                return 'ERROR: NO_STUDENT_ID';
+            }
+
+            if (!folderExists) {
+                return `CREATE_FOLDER: ${studentId}\nTHEN_STORE: ${fallbackDocType}`;
+            }
+
+            return `STORE: ${studentId} → ${fallbackDocType}`;
         }
-
-        if (!folderExists) {
-            return `CREATE_FOLDER: ${studentId}\nTHEN_STORE: ${documentType}`;
-        }
-
-        return `STORE: ${studentId} → ${documentType}`;
     }
 
     /**
