@@ -1,47 +1,24 @@
 const { google } = require('googleapis');
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
 
-// OAuth2 Client Configuration
-const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-);
+const KEY_FILE_PATH = path.join(__dirname, 'service-account.json');
 
-// Set credentials if refresh token exists
-if (process.env.GOOGLE_REFRESH_TOKEN) {
-    oauth2Client.setCredentials({
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+let drive;
+
+if (fs.existsSync(KEY_FILE_PATH)) {
+    console.log('✅ Service Account credentials found.');
+    const auth = new google.auth.GoogleAuth({
+        keyFile: KEY_FILE_PATH,
+        scopes: ['https://www.googleapis.com/auth/drive'],
     });
+
+    drive = google.drive({ version: 'v3', auth });
+} else {
+    console.log('⚠️ Service Account credentials NOT found. Please add config/service-account.json');
+    drive = null;
 }
 
-// Create Drive instance
-const drive = google.drive({ version: 'v3', auth: oauth2Client });
-
-// Generate Auth URL for initial setup
-const getAuthUrl = () => {
-    const scopes = [
-        'https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/drive.metadata.readonly'
-    ];
-
-    return oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: scopes,
-        prompt: 'consent'
-    });
-};
-
-// Exchange code for tokens
-const getTokens = async (code) => {
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
-    return tokens;
-};
-
 module.exports = {
-    oauth2Client,
-    drive,
-    getAuthUrl,
-    getTokens
+    drive
 };

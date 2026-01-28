@@ -7,14 +7,18 @@ class DriveService {
     constructor() {
         this.parentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
         this.folderCache = new Map(); // Cache for student folder IDs
-        this.isMockMode = !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_REFRESH_TOKEN;
+
+        // Use Mock Mode if drive client is not initialized or explicity requested
+        this.isMockMode = !drive;
 
         if (this.isMockMode) {
-            console.log('⚠️  GOOGLE DRIVE CREDENTIALS MISSING: Running in MOCK MODE (Local Storage)');
+            console.log('⚠️  GOOGLE DRIVE NOT CONFIGURED: Running in MOCK MODE (Local Storage)');
             this.mockStoragePath = path.join(__dirname, '../public/uploads/mock_drive');
             if (!fs.existsSync(this.mockStoragePath)) {
                 fs.mkdirSync(this.mockStoragePath, { recursive: true });
             }
+        } else {
+            console.log('🚀 Google Drive Integration Active');
         }
     }
 
@@ -24,10 +28,14 @@ class DriveService {
     async createFolder(folderName, parentId = null) {
         if (this.isMockMode) return { id: 'mock-folder-' + folderName, name: folderName };
 
+        // If no parent ID is provided and we have a root set in Env, use it.
+        // If no root set in Env, we use 'root' (Service Account's top level)
+        const parents = parentId ? [parentId] : (this.parentFolderId ? [this.parentFolderId] : []);
+
         const fileMetadata = {
             name: folderName,
             mimeType: 'application/vnd.google-apps.folder',
-            parents: parentId ? [parentId] : [this.parentFolderId]
+            parents: parents
         };
 
         try {
@@ -55,9 +63,14 @@ class DriveService {
         }
 
         try {
-            // Search for existing folder
+            // Search scope - if parent folder is defined, search there. Otherwise search everywhere.
+            let query = `name='${studentId}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+            if (this.parentFolderId) {
+                query += ` and '${this.parentFolderId}' in parents`;
+            }
+
             const response = await drive.files.list({
-                q: `name='${studentId}' and mimeType='application/vnd.google-apps.folder' and '${this.parentFolderId}' in parents and trashed=false`,
+                q: query,
                 fields: 'files(id, name)',
                 spaces: 'drive'
             });
