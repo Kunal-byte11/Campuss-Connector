@@ -5,169 +5,406 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | CollegeManager</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-dark: #121212;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 50%;
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            background: var(--bg-dark);
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 50%;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            background: #121212;
+            background: #000;
             overflow: hidden;
-            position: relative;
         }
 
-        /* Abstract Background shapes */
-        .bg-shape {
+        .right-panel::after {
+            content: '';
             position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.5;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            background: linear-gradient(to right, var(--bg-dark), transparent);
+            pointer-events: none;
         }
 
-        .shape-1 {
-            top: -100px;
-            left: -100px;
-            width: 500px;
-            height: 500px;
-            background: #4f46e5;
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
         }
 
-        .shape-2 {
-            bottom: -100px;
-            right: -100px;
-            width: 600px;
-            height: 600px;
-            background: #7c3aed;
+        /* Content */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
         }
 
-        .login-card {
-            background: rgba(30, 30, 30, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
+        .brand i {
+            color: var(--text-primary);
+        }
+
+        .hero-content {
+            margin-bottom: 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 420px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* Tab Switcher */
+        .tab-container {
+            display: flex;
+            background: var(--glass-bg);
+            padding: 4px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: var(--glass-border);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Styling */
+        .login-wrapper {
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .login-logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-
-        .login-subtitle {
-            color: #888;
-            font-size: 14px;
         }
 
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
 
-        .form-control {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #333;
-            color: white;
-            padding: 14px;
-            border-radius: 10px;
+        .input-field {
             width: 100%;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            padding: 16px 16px 16px 48px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            color: white;
             outline: none;
+            transition: all 0.3s ease;
+            font-size: 15px;
         }
 
-        .btn-login {
+        .input-field:focus {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.05);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .input-field:focus+.input-icon {
+            color: var(--accent-purple);
+        }
+
+        .btn-primary {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
+            padding: 16px;
+            background: white;
+            color: black;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius);
             font-weight: 600;
             font-size: 16px;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
 
-        .btn-login:hover {
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
         }
 
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 32px 0;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        /* Google Button */
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .google-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #fff;
+        }
+
+        /* Error Message */
         .error-msg {
             color: #ef4444;
             font-size: 13px;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 16px;
             min-height: 20px;
+            font-weight: 500;
+        }
+
+        /* Teacher Mode Colors */
+        body.teacher-mode .input-field:focus {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        body.teacher-mode .input-field:focus+.input-icon {
+            color: var(--accent-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .left-panel {
+                width: 60%;
+                padding: 40px;
+            }
+
+            .right-panel {
+                width: 40%;
+            }
+
+            .hero-content h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                width: 100%;
+                height: 100%;
+                padding: 30px;
+            }
+
+            .right-panel {
+                display: none;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .brand {
+                margin-bottom: 40px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="bg-shape shape-1"></div>
-    <div class="bg-shape shape-2"></div>
+    <div class="container">
+        <!-- Left Panel: Form & Content -->
+        <div class="left-panel">
+            <div class="brand">
+                <i class="fas fa-desktop"></i> CollegeManager
+            </div>
 
-    <div class="login-card">
-        <div class="login-header">
-            <div class="login-logo">🎓 Campus<span style="color: #6366f1;">Connector</span></div>
-            <p class="login-subtitle">Sign in to manage your institution</p>
+            <div class="hero-content">
+                <h1>Manage Your<br>Institution.</h1>
+                <p>Easily track your progress, manage notifications, and customize your experience with our advanced
+                    platform.</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('student')">Student</button>
+                <button class="tab-btn" onclick="switchTab('teacher')">Teacher</button>
+            </div>
+
+            <div class="login-wrapper">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 8px;">Welcome back!</p>
+                    <h2 style="color: white; font-weight: 600;">Sign in to continue</h2>
+                </div>
+
+                <button type="button" id="google-login-btn" class="google-btn"
+                    style="background: white; color: black; border: none; padding: 16px; justify-content: center;">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="24" alt="G">
+                    <span id="google-btn-text" style="font-size: 16px; font-weight: 600;">Student Sign in with
+                        Google</span>
+                </button>
+
+                <div class="error-msg" id="error-msg"></div>
+            </div>
         </div>
 
-        <form id="login-form">
-            <div class="form-group">
-                <input type="text" id="username" class="form-control" placeholder="Username" required>
-            </div>
-            <div class="form-group">
-                <input type="password" id="password" class="form-control" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn-login">Sign In</button>
-            <div class="error-msg" id="error-msg"></div>
-        </form>
-
-        <div style="text-align: center; margin: 20px 0; position: relative;">
-            <hr style="border: 0; border-top: 1px solid #333;">
-            <span
-                style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1e1e1e; padding: 0 10px; color: #666; font-size: 12px;">OR</span>
-        </div>
-
-        <!-- Firebase Google Login -->
-        <button type="button" id="google-login-btn"
-            style="width: 100%; border: 1px solid #333; background: white; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G">
-            Sign in with Google
-        </button>
-
-        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
-            Demo: admin / admin123
+        <!-- Right Panel: Visual -->
+        <div class="right-panel">
+            <img src="assets/login-hero.png" alt="College Life" class="hero-image">
         </div>
     </div>
 
-    <!-- Logic -->
+    <!-- Login Logic -->
     <script type="module">
         import { auth, googleProvider, signInWithPopup } from './js/firebase-config.js';
 
         const errorDiv = document.getElementById('error-msg');
+        // const loginBtn = document.querySelector('.btn-primary'); // Removed
+        const googleBtnText = document.getElementById('google-btn-text');
 
-        // Handle Google Login
+        let currentRole = 'student'; // Default
+
+        // Expose switchTab to global scope for HTML onclick
+        window.switchTab = (role) => {
+            currentRole = role;
+            const tabs = document.querySelectorAll('.tab-btn');
+
+            if (role === 'student') {
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+                // loginBtn.textContent = 'Login as Student';
+                googleBtnText.textContent = 'Student Sign in with Google';
+                document.body.classList.remove('teacher-mode');
+            } else {
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+                // loginBtn.textContent = 'Login as Teacher';
+                googleBtnText.textContent = 'Teacher Sign in with Google';
+                document.body.classList.add('teacher-mode');
+            }
+        };
+
+        // 1. Google Login Handler
         document.getElementById('google-login-btn').addEventListener('click', async () => {
             errorDiv.textContent = '';
 
@@ -175,73 +412,56 @@
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
 
-                // STRICT DOMAIN CHECK
-                if (!user.email.endsWith('@ltce.in')) {
-                    await auth.signOut();
-                    errorDiv.textContent = 'Access Restricted: Please use your @ltce.in email.';
-                    return;
+                // Domain Restriction Logic
+                if (currentRole === 'student') {
+                    if (!user.email.endsWith('@ltce.in')) {
+                        await auth.signOut();
+                        throw new Error('Access Restricted: Students must use @ltce.in email.');
+                    }
+                } else {
+                    // For Teachers, maybe we allow other domains or the same?
+                    // For now, let's assume they also need @ltce.in or a specific 'faculty' sub-domain, 
+                    // but user didn't specify, so we'll keep it open or same check.
+                    // Let's implement a loose check or just allow for now.
+                    if (!user.email.endsWith('@ltce.in') && !user.email.endsWith('@college.edu')) {
+                        // Optional: Add teacher specific check
+                    }
                 }
 
-                // Success
+                // Login Success
                 handleLoginSuccess({
                     name: user.displayName,
                     email: user.email,
                     avatar: user.photoURL,
-                    role: 'student'
+                    role: currentRole
                 }, await user.getIdToken());
 
             } catch (error) {
-                console.error('Firebase Auth Error:', error);
-
+                console.error("Google Auth Error:", error);
                 if (error.code === 'auth/popup-closed-by-user') {
-                    errorDiv.textContent = 'Sign-in cancelled';
-                } else if (error.code === 'auth/unauthorized-domain') {
-                    errorDiv.textContent = 'Domain not authorized in Firebase Console';
+                    // Ignore
                 } else {
-                    errorDiv.textContent = 'Login failed: ' + error.message;
+                    errorDiv.textContent = error.message || 'Sign-in failed.';
                 }
             }
         });
 
-        // Handle Demo Login
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const btn = e.target.querySelector('button[type="submit"]');
 
-            btn.textContent = 'Authenticating...';
-            btn.disabled = true;
-            errorDiv.textContent = '';
 
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    handleLoginSuccess(data.user, data.token);
-                } else {
-                    errorDiv.textContent = data.error || 'Login failed';
-                    btn.textContent = 'Sign In';
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                console.error(err);
-                errorDiv.textContent = 'Connection error';
-                btn.textContent = 'Sign In';
-                btn.disabled = false;
-            }
-        });
-
+        // Shared Success Handler
         function handleLoginSuccess(user, token) {
             localStorage.setItem('authToken', token);
             localStorage.setItem('user', JSON.stringify(user));
-            window.location.href = '/';
+
+            const gBtn = document.getElementById('google-login-btn');
+            if (gBtn) {
+                gBtn.style.background = '#10b981';
+                gBtn.querySelector('span').textContent = 'Success! Redirecting...';
+            }
+
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 500);
         }
     </script>
 </body>

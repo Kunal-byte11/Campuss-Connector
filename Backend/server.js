@@ -18,6 +18,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
+// Serve login page for clean URL
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/login.html'));
+});
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const os = require('os');
