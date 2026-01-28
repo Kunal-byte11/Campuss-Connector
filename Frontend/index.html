@@ -1,105 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Connector | College Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>CollegeManager | Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    <div class="bg-animation">
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-    </div>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">🎓 Campus<span class="highlight">Connector</span></div>
-            <div class="nav-links">
-                <a href="#" class="nav-link active" data-section="dashboard">Dashboard</a>
-                <a href="#" class="nav-link" data-section="students">Students</a>
-                <a href="#" class="nav-link" data-section="upload">Upload</a>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div>
+            <!-- Profile Summary -->
+            <div class="profile-summary">
+                <div class="avatar">JS</div>
+                <div class="profile-info">
+                    <h3>Admin User</h3>
+                    <span>admin@college.edu</span>
+                </div>
             </div>
+
+            <!-- Navigation -->
+            <nav class="nav-menu">
+                <a href="#" class="nav-link active" data-section="dashboard">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-link" data-section="students">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Students</span>
+                </a>
+                <a href="#" class="nav-link" data-section="courses">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Courses</span>
+                </a>
+                <a href="#" class="nav-link" data-section="upload">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Upload</span>
+                </a>
+                <a href="#" class="nav-link" data-section="reports">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Reports</span>
+                </a>
+            </nav>
         </div>
-    </nav>
 
+        <div class="sidebar-footer">
+            <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Preferences</span>
+            </a>
+            <a href="#" class="nav-link" style="color: var(--danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
     <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="Search students, courses...">
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-icon"><i class="fa-regular fa-bell"></i></button>
+                <button class="btn btn-icon"><i class="fa-regular fa-envelope"></i></button>
+                <button class="btn btn-primary" onclick="openModal('add-student-modal')">
+                    <i class="fa-solid fa-plus"></i> Add New
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD SECTION -->
         <section id="dashboard" class="section active">
-            <h1 class="section-title">Dashboard</h1>
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-value" id="total-students">0</div><div class="stat-label">Students</div></div>
-                <div class="stat-card"><div class="stat-value" id="total-documents">0</div><div class="stat-label">Documents</div></div>
-                <div class="stat-card"><div class="stat-value" id="total-departments">0</div><div class="stat-label">Departments</div></div>
+            <h2 class="section-title">Overview</h2>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-students">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-documents">0</div>
+                    <div class="stat-label">Documents Processed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-departments">0</div>
+                    <div class="stat-label">Active Departments</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Recent Activity</h2>
+            <!-- We reuse students grid here for now to mimic 'Popular Courses' look -->
+            <div id="recent-grid" class="card-grid">
+                <!-- Javascript will populate this -->
             </div>
         </section>
 
+        <!-- STUDENTS SECTION -->
         <section id="students" class="section">
-            <div class="section-header">
-                <h1 class="section-title">Students</h1>
-                <button class="btn btn-primary" onclick="openModal('add-student-modal')">+ Add Student</button>
+            <div class="section-title">
+                All Students
+                <div style="font-size: 14px; font-weight: 400; color: #888;">Manage student records</div>
             </div>
-            <div class="search-box"><input type="text" id="search-input" placeholder="Search students..."></div>
-            <div class="students-grid" id="students-grid"></div>
+            <div id="students-grid" class="card-grid">
+                <!-- Javascript will populate this -->
+            </div>
         </section>
 
+        <!-- UPLOAD SECTION -->
         <section id="upload" class="section">
-            <h1 class="section-title">Upload Documents</h1>
-            <div class="upload-container">
-                <form id="upload-form" class="upload-form">
+            <h2 class="section-title">Upload Documents</h2>
+            <div style="max-width: 600px; margin: 0 auto;">
+                <form id="upload-form">
                     <div class="form-group">
-                        <label>Student ID</label>
-                        <select id="upload-student" required><option value="">Select student...</option></select>
+                        <label>Select Student</label>
+                        <select id="upload-student" class="form-control" required>
+                            <option value="">Choose a student...</option>
+                        </select>
                     </div>
-                    <div class="dropzone" id="dropzone">
-                        <p>📁 Drag & drop or click to upload</p>
+
+                    <div class="upload-area" id="dropzone">
+                        <i class="fa-solid fa-cloud-arrow-up"
+                            style="font-size: 48px; color: #666; margin-bottom: 20px;"></i>
+                        <h3>Click or drag file to upload</h3>
+                        <p style="color: #888; font-size: 13px;">PDF, JPG, PNG supported</p>
                         <input type="file" id="file-input" hidden>
                     </div>
-                    <div id="selected-file" class="selected-file" style="display:none;">
-                        <span id="file-name"></span>
-                        <button type="button" onclick="removeFile()">✕</button>
+
+                    <div id="selected-file" class="stat-card"
+                        style="display:none; flex-direction: row; justify-content: space-between; align-items: center; margin-top: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fa-solid fa-file-pdf" style="font-size: 24px;"></i>
+                            <span id="file-name" style="font-size: 14px; color: white;">filename.pdf</span>
+                        </div>
+                        <button type="button" onclick="removeFile()"
+                            style="background: none; border: none; color: #ef4444; cursor: pointer;">✕</button>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full" id="upload-btn" disabled>Upload</button>
+
+                    <div id="ai-response" class="stat-card"
+                        style="display:none; margin-top: 20px; border: 1px solid #333;">
+                        <h4 style="margin-bottom: 10px; color: #8b5cf6;">✨ Gemini Analysis</h4>
+                        <p id="ai-message" style="font-size: 13px; color: #ccc; line-height: 1.5;"></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="upload-btn"
+                        style="width: 100%; margin-top: 24px; padding: 14px;" disabled>
+                        Upload Document
+                    </button>
                 </form>
-                <div id="ai-response" class="ai-response" style="display:none;">
-                    <div class="ai-header">🤖 AI Response</div>
-                    <div id="ai-message" class="ai-message"></div>
+            </div>
+        </section>
+
+        <!-- PLACEHOLDER SECTIONS -->
+        <section id="courses" class="section">
+            <h2 class="section-title">My Courses</h2>
+            <div class="card-grid">
+                <!-- Static example cards to match image -->
+                <div class="card">
+                    <div class="card-image-placeholder"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Data Science</div>
+                            <div class="card-subtitle">Introduction to Analysis</div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag">CS-101</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-image-placeholder"><i class="fa-solid fa-pen-nib"></i></div>
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Web Design</div>
+                            <div class="card-subtitle">UI/UX Principles</div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag">DES-202</span>
+                    </div>
                 </div>
             </div>
         </section>
+
+        <section id="reports" class="section">
+            <h2 class="section-title">Reports</h2>
+            <p>Reports and Analytics will appear here.</p>
+        </section>
+
     </main>
 
+    <!-- ADD STUDENT MODAL -->
     <div class="modal" id="add-student-modal">
         <div class="modal-backdrop" onclick="closeModal('add-student-modal')"></div>
         <div class="modal-content">
-            <h2>Add Student</h2>
+            <h2 style="margin-bottom: 20px;">Add New Student</h2>
             <form id="add-student-form">
-                <input type="text" id="new-student-id" placeholder="Student ID (e.g., ST101)" required>
-                <input type="text" id="new-student-name" placeholder="Full Name" required>
-                <select id="new-student-dept">
-                    <option value="">Department</option>
-                    <option>Computer Science</option>
-                    <option>Electronics</option>
-                    <option>Mechanical</option>
-                </select>
-                <input type="email" id="new-student-email" placeholder="Email">
-                <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeModal('add-student-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add</button>
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" id="new-student-id" class="form-control" placeholder="ST101" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="new-student-name" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="new-student-dept" class="form-control">
+                        <option>Computer Science</option>
+                        <option>Electronics</option>
+                        <option>Mechanical</option>
+                        <option>Civil</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px;">
+                    <button type="button" class="btn" onclick="closeModal('add-student-modal')"
+                        style="background: #333; color: white;">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Student</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- VIEW STUDENT DETAILS MODAL -->
     <div class="modal" id="view-student-modal">
         <div class="modal-backdrop" onclick="closeModal('view-student-modal')"></div>
-        <div class="modal-content modal-large">
-            <h2 id="view-student-title">Student Details</h2>
+        <div class="modal-content" style="max-width: 600px;">
+            <h2 id="view-student-title" style="margin-bottom: 20px;">Student Details</h2>
             <div id="view-student-body"></div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="closeModal('view-student-modal')"
+                    style="background: #333; color: white;">Close</button>
+            </div>
         </div>
     </div>
 
-    <div id="toast-container" class="toast-container"></div>
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 2000;"></div>
+
     <script src="js/app.js"></script>
 </body>
+
 </html>

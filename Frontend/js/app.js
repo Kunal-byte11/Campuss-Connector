@@ -42,26 +42,64 @@ async function loadStudents() {
 
 function renderStudents() {
     const grid = document.getElementById('students-grid');
+    const recentGrid = document.getElementById('recent-grid');
+
     if (students.length === 0) {
-        grid.innerHTML = '<div class="empty-state">No students found. Add your first student!</div>';
+        grid.innerHTML = '<div style="color: #666; grid-column: 1/-1; text-align: center; padding: 40px;">No students found. Add your first student!</div>';
         return;
     }
 
-    grid.innerHTML = students.map(s => `
-        <div class="student-card" onclick="viewStudent('${s.studentId}')">
-            <div class="student-header">
-                <div class="student-avatar">${s.name?.charAt(0) || s.studentId.charAt(0)}</div>
-                <div>
-                    <div class="student-name">${s.name || 'Unnamed'}</div>
-                    <div class="student-id">${s.studentId}</div>
-                </div>
+    const cardsHtml = students.map((s, index) => {
+        // Deterministic random gradients for avatars/placeholders
+        const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#818cf8', '#a78bfa', '#f472b6'];
+        const color = colors[index % colors.length];
+        const docCount = countDocs(s);
+
+        return `
+        <div class="card" onclick="viewStudent('${s.studentId}')" style="cursor: pointer;">
+            <div class="card-image-placeholder" style="background: linear-gradient(135deg, ${color}, #222);">
+                <span style="font-size: 40px;">${s.name?.charAt(0) || s.studentId.charAt(0)}</span>
             </div>
-            <div class="student-meta">
-                <span class="meta-tag">${s.department || 'No Dept'}</span>
-                <span class="meta-tag">📄 ${countDocs(s)} docs</span>
+            <div class="card-header">
+                <div>
+                    <div class="card-title">${s.name || 'Unnamed'}</div>
+                    <div class="card-subtitle">${s.department || 'No Dept'}</div>
+                </div>
+                <i class="fa-regular fa-star" style="color: #666;"></i>
+            </div>
+            <div class="card-footer">
+                <span class="tag">${s.studentId}</span>
+                <span style="font-size: 12px; color: #888;">
+                    <i class="fa-solid fa-file-lines" style="margin-right: 4px;"></i> ${docCount} Docs
+                </span>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
+
+    grid.innerHTML = cardsHtml;
+
+    // Also populate recent activity in dashboard (top 3)
+    if (recentGrid) {
+        recentGrid.innerHTML = students.slice(0, 3).map((s, index) => {
+            const colors = ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#818cf8', '#a78bfa', '#f472b6'];
+            const color = colors[index % colors.length];
+            return `
+             <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">${s.name}</div>
+                        <div class="card-subtitle">Activity detected</div>
+                    </div>
+                    <div style="width: 10px; height: 10px; background: ${color}; border-radius: 50%;"></div>
+                </div>
+                <div style="margin-top: 10px; font-size: 13px; color: #aaa;">
+                    Uploaded ${countDocs(s)} documents in ${s.department || 'General'}
+                </div>
+             </div>
+             `;
+        }).join('');
+    }
 }
 
 function countDocs(student) {
@@ -198,27 +236,48 @@ async function viewStudent(studentId) {
 
     const docs = student.documents || {};
     const docTypes = [
-        { key: 'assignmentLinks', label: '📝 Assignments' },
-        { key: 'idCardLinks', label: '🪪 ID Cards' },
-        { key: 'certificateLinks', label: '🏆 Certificates' },
-        { key: 'feeReceiptLinks', label: '🧾 Fee Receipts' }
+        { key: 'assignmentLinks', label: 'Assignments', icon: 'fa-book' },
+        { key: 'idCardLinks', label: 'ID Cards', icon: 'fa-id-card' },
+        { key: 'certificateLinks', label: 'Certificates', icon: 'fa-certificate' },
+        { key: 'feeReceiptLinks', label: 'Fee Receipts', icon: 'fa-receipt' }
     ];
 
     let html = `
-        <p><strong>ID:</strong> ${student.studentId}</p>
-        <p><strong>Department:</strong> ${student.department || 'N/A'}</p>
-        <p><strong>Email:</strong> ${student.email || 'N/A'}</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; background: #252525; padding: 20px; border-radius: 12px;">
+            <div>
+                <p style="color: #888; font-size: 12px;">Student ID</p>
+                <p style="color: white; font-weight: 600;">${student.studentId}</p>
+            </div>
+            <div>
+                <p style="color: #888; font-size: 12px;">Department</p>
+                <p style="color: white; font-weight: 600;">${student.department || 'N/A'}</p>
+            </div>
+            <div>
+                <p style="color: #888; font-size: 12px;">Email</p>
+                <p style="color: white; font-weight: 600;">${student.email || 'N/A'}</p>
+            </div>
+        </div>
     `;
 
-    docTypes.forEach(({ key, label }) => {
+    docTypes.forEach(({ key, label, icon }) => {
         const items = docs[key] || [];
-        html += `<div class="documents-section"><h4>${label} (${items.length})</h4>`;
+        html += `<div style="margin-bottom: 24px;">
+            <h4 style="color: #a0a0a0; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fa-solid ${icon}" style="margin-right: 8px;"></i> ${label}
+            </h4>`;
+
         if (items.length) {
-            html += '<div class="doc-list">' + items.map(d =>
-                `<div class="doc-item"><a href="${d.shareableLink}" target="_blank">${d.fileName}</a></div>`
+            html += '<div style="display: grid; gap: 10px;">' + items.map(d =>
+                `<div style="background: #2a2a2a; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <a href="${d.shareableLink}" target="_blank" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 14px;">
+                        <i class="fa-regular fa-file-pdf" style="color: #ef4444;"></i>
+                        ${d.fileName}
+                    </a>
+                    <span style="font-size: 11px; color: #666;">${new Date(d.uploadedAt || Date.now()).toLocaleDateString()}</span>
+                </div>`
             ).join('') + '</div>';
         } else {
-            html += '<p class="empty-state">No documents</p>';
+            html += '<p style="color: #444; font-size: 13px; font-style: italic;">No documents uploaded</p>';
         }
         html += '</div>';
     });
