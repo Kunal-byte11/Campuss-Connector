@@ -7,12 +7,23 @@ class DriveService {
     constructor() {
         this.parentFolderId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
         this.folderCache = new Map(); // Cache for student folder IDs
+        this.isMockMode = !process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_REFRESH_TOKEN;
+
+        if (this.isMockMode) {
+            console.log('⚠️  GOOGLE DRIVE CREDENTIALS MISSING: Running in MOCK MODE (Local Storage)');
+            this.mockStoragePath = path.join(__dirname, '../public/uploads/mock_drive');
+            if (!fs.existsSync(this.mockStoragePath)) {
+                fs.mkdirSync(this.mockStoragePath, { recursive: true });
+            }
+        }
     }
 
     /**
-     * Create a folder in Google Drive
+     * Create a folder in Google Drive (or Mock)
      */
     async createFolder(folderName, parentId = null) {
+        if (this.isMockMode) return { id: 'mock-folder-' + folderName, name: folderName };
+
         const fileMetadata = {
             name: folderName,
             mimeType: 'application/vnd.google-apps.folder',
@@ -36,6 +47,8 @@ class DriveService {
      * Find or create student folder
      */
     async getStudentFolder(studentId) {
+        if (this.isMockMode) return 'mock-folder-' + studentId;
+
         // Check cache first
         if (this.folderCache.has(studentId)) {
             return this.folderCache.get(studentId);
@@ -67,6 +80,11 @@ class DriveService {
      * Create student folder with document type subfolders
      */
     async createStudentFolder(studentId) {
+        if (this.isMockMode) {
+            this.folderCache.set(studentId, 'mock-folder-' + studentId);
+            return 'mock-folder-' + studentId;
+        }
+
         try {
             // Create main student folder
             const mainFolder = await this.createFolder(studentId);
@@ -90,6 +108,8 @@ class DriveService {
      * Get subfolder ID for document type
      */
     async getDocumentTypeFolder(studentFolderId, documentType) {
+        if (this.isMockMode) return 'mock-folder-' + documentType;
+
         const folderNames = {
             'assignment': 'assignments',
             'idCard': 'idCards',
@@ -123,6 +143,23 @@ class DriveService {
      * Upload file to Google Drive
      */
     async uploadFile(filePath, fileName, mimeType, folderId) {
+        if (this.isMockMode) {
+            // Simulate cloud upload by moving file to public folder
+            const mockUrl = `/uploads/mock_drive/${Date.now()}-${fileName}`;
+            const targetPath = path.join(this.mockStoragePath, path.basename(mockUrl));
+
+            fs.copyFileSync(filePath, targetPath);
+            fs.unlinkSync(filePath); // Remove temp file
+
+            // Return mock Google Drive response
+            return {
+                fileId: 'mock-file-' + Date.now(),
+                fileName: fileName,
+                shareableLink: mockUrl, // Points to local file
+                downloadLink: mockUrl
+            };
+        }
+
         const fileMetadata = {
             name: fileName,
             parents: [folderId]
@@ -174,6 +211,8 @@ class DriveService {
      * Delete file from Google Drive
      */
     async deleteFile(fileId) {
+        if (this.isMockMode) return true;
+
         try {
             await drive.files.delete({ fileId });
             return true;
@@ -187,6 +226,8 @@ class DriveService {
      * List files in a folder
      */
     async listFiles(folderId) {
+        if (this.isMockMode) return [];
+
         try {
             const response = await drive.files.list({
                 q: `'${folderId}' in parents and trashed=false`,
