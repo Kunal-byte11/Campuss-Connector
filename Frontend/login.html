@@ -149,71 +149,66 @@
                 style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1e1e1e; padding: 0 10px; color: #666; font-size: 12px;">OR</span>
         </div>
 
-        <!-- Google Sign-In Container -->
-        <div id="g_id_onload" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
-            data-auto_prompt="false">
-        </div>
-
-        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
-            data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="320">
-        </div>
+        <!-- Firebase Google Login -->
+        <button type="button" id="google-login-btn"
+            style="width: 100%; border: 1px solid #333; background: white; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: background 0.2s;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="G">
+            Sign in with Google
+        </button>
 
         <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
             Demo: admin / admin123
         </div>
     </div>
 
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Logic -->
+    <script type="module">
+        import { auth, googleProvider, signInWithPopup } from './js/firebase-config.js';
 
-    <script>
-        // Fetch Client ID and Init Google Auth
-        fetch('/api/config')
-            .then(res => res.json())
-            .then(data => {
-                const clientId = data.googleClientId;
-                if (clientId) {
-                    const div = document.getElementById('g_id_onload');
-                    div.setAttribute('data-client_id', clientId);
-                } else {
-                    console.warn('Google Client ID not found in config');
-                }
-            })
-            .catch(err => console.error('Failed to load config', err));
+        const errorDiv = document.getElementById('error-msg');
 
-        // Handle Google Response
-        async function handleCredentialResponse(response) {
-            const errorDiv = document.getElementById('error-msg');
-            errorDiv.textContent = 'Verifying with server...';
+        // Handle Google Login
+        document.getElementById('google-login-btn').addEventListener('click', async () => {
+            errorDiv.textContent = '';
 
             try {
-                const res = await fetch('/api/auth/google', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential })
-                });
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
 
-                const data = await res.json();
-
-                if (res.ok) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/';
-                } else {
-                    errorDiv.textContent = data.error || 'Authentication failed';
+                // STRICT DOMAIN CHECK
+                if (!user.email.endsWith('@ltce.in')) {
+                    await auth.signOut();
+                    errorDiv.textContent = 'Access Restricted: Please use your @ltce.in email.';
+                    return;
                 }
-            } catch (err) {
-                console.error(err);
-                errorDiv.textContent = 'Connection error during Google Auth';
-            }
-        }
 
+                // Success
+                handleLoginSuccess({
+                    name: user.displayName,
+                    email: user.email,
+                    avatar: user.photoURL,
+                    role: 'student'
+                }, await user.getIdToken());
+
+            } catch (error) {
+                console.error('Firebase Auth Error:', error);
+
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorDiv.textContent = 'Sign-in cancelled';
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorDiv.textContent = 'Domain not authorized in Firebase Console';
+                } else {
+                    errorDiv.textContent = 'Login failed: ' + error.message;
+                }
+            }
+        });
+
+        // Handle Demo Login
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('error-msg');
-            const btn = e.target.querySelector('button');
+            const btn = e.target.querySelector('button[type="submit"]');
 
             btn.textContent = 'Authenticating...';
             btn.disabled = true;
@@ -229,9 +224,7 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/';
+                    handleLoginSuccess(data.user, data.token);
                 } else {
                     errorDiv.textContent = data.error || 'Login failed';
                     btn.textContent = 'Sign In';
@@ -244,6 +237,12 @@
                 btn.disabled = false;
             }
         });
+
+        function handleLoginSuccess(user, token) {
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.href = '/';
+        }
     </script>
 </body>
 
