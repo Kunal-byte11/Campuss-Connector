@@ -1,0 +1,55 @@
+{
+    "students": [
+        {
+            "id": "demo-001",
+            "studentId": "ST101",
+            "name": "Rahul Sharma",
+            "department": "Computer Science",
+            "email": "rahul.sharma@college.edu",
+            "phone": "9876543210",
+            "documents": {
+                "assignmentLinks": [],
+                "idCardLinks": [],
+                "certificateLinks": [],
+                "feeReceiptLinks": []
+            },
+            "driveFolderId": null,
+            "createdAt": "2026-01-28T05:00:00.000Z",
+            "updatedAt": "2026-01-28T05:00:00.000Z"
+        },
+        {
+            "id": "demo-002",
+            "studentId": "ST102",
+            "name": "Priya Patel",
+            "department": "Electronics",
+            "email": "priya.patel@college.edu",
+            "phone": "9876543211",
+            "documents": {
+                "assignmentLinks": [],
+                "idCardLinks": [],
+                "certificateLinks": [],
+                "feeReceiptLinks": []
+            },
+            "driveFolderId": null,
+            "createdAt": "2026-01-28T05:00:00.000Z",
+            "updatedAt": "2026-01-28T05:00:00.000Z"
+        },
+        {
+            "id": "demo-003",
+            "studentId": "ST103",
+            "name": "Amit Kumar",
+            "department": "Mechanical",
+            "email": "amit.kumar@college.edu",
+            "phone": "9876543212",
+            "documents": {
+                "assignmentLinks": [],
+                "idCardLinks": [],
+                "certificateLinks": [],
+                "feeReceiptLinks": []
+            },
+            "driveFolderId": null,
+            "createdAt": "2026-01-28T05:00:00.000Z",
+            "updatedAt": "2026-01-28T05:00:00.000Z"
+        }
+    ]
+}
