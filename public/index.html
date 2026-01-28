@@ -100,7 +100,27 @@
             <h2 class="section-title">Recent Activity</h2>
             <!-- We reuse students grid here for now to mimic 'Popular Courses' look -->
             <div id="recent-grid" class="card-grid">
-                <!-- Javascript will populate this -->
+                <div class="card" style="border-left: 4px solid #3b82f6;">
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Today, 10:30 AM</div>
+                        <h4 style="margin-bottom: 5px;">Assignment Uploaded</h4>
+                        <p style="font-size: 13px; color: #ccc;">"Neural Networks.pdf" was successfully processed.</p>
+                    </div>
+                </div>
+                <div class="card" style="border-left: 4px solid #10b981;">
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">Yesterday</div>
+                        <h4 style="margin-bottom: 5px;">Attendance Updated</h4>
+                        <p style="font-size: 13px; color: #ccc;">You have been marked present for 5 lectures.</p>
+                    </div>
+                </div>
+                <div class="card" style="border-left: 4px solid #f59e0b;">
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: #888; margin-bottom: 5px;">2 Days Ago</div>
+                        <h4 style="margin-bottom: 5px;">New Course Material</h4>
+                        <p style="font-size: 13px; color: #ccc;">Prof. Sharma added "Graph Theory Notes".</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -161,39 +181,113 @@
 
         <!-- PLACEHOLDER SECTIONS -->
         <section id="courses" class="section">
-            <h2 class="section-title">My Courses</h2>
+            <h2 class="section-title">Enrolled Courses</h2>
             <div class="card-grid">
-                <!-- Static example cards to match image -->
                 <div class="card">
-                    <div class="card-image-placeholder"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div class="card-image-placeholder" style="background: linear-gradient(45deg, #3b82f6, #1d4ed8);">
+                        <i class="fa-solid fa-code" style="font-size: 32px; color: white;"></i>
+                    </div>
                     <div class="card-header">
                         <div>
-                            <div class="card-title">Data Science</div>
-                            <div class="card-subtitle">Introduction to Analysis</div>
+                            <div class="card-title">Full Stack Development</div>
+                            <div class="card-subtitle">Prof. Sharma • Mon/Wed</div>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <span class="tag">CS-101</span>
+                        <span class="tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">CS-302</span>
+                        <span style="font-size: 12px; color: #888;">Progress: 75%</span>
                     </div>
                 </div>
+
                 <div class="card">
-                    <div class="card-image-placeholder"><i class="fa-solid fa-pen-nib"></i></div>
+                    <div class="card-image-placeholder" style="background: linear-gradient(45deg, #8b5cf6, #6d28d9);">
+                        <i class="fa-solid fa-brain" style="font-size: 32px; color: white;"></i>
+                    </div>
                     <div class="card-header">
                         <div>
-                            <div class="card-title">Web Design</div>
-                            <div class="card-subtitle">UI/UX Principles</div>
+                            <div class="card-title">Artificial Intelligence</div>
+                            <div class="card-subtitle">Prof. Davinci • Tue/Thu</div>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <span class="tag">DES-202</span>
+                        <span class="tag" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">AI-401</span>
+                        <span style="font-size: 12px; color: #888;">Progress: 40%</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-image-placeholder" style="background: linear-gradient(45deg, #10b981, #047857);">
+                        <i class="fa-solid fa-database" style="font-size: 32px; color: white;"></i>
+                    </div>
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Database Systems</div>
+                            <div class="card-subtitle">Dr. Rao • Friday</div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">DB-201</span>
+                        <span style="font-size: 12px; color: #888;">Progress: 90%</span>
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="reports" class="section">
-            <h2 class="section-title">Reports</h2>
-            <p>Reports and Analytics will appear here.</p>
+            <h2 class="section-title">Academic Reports</h2>
+            <div class="stats-overview"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="stat-card"
+                    style="background: #1e1e1e; padding: 20px; border-radius: 12px; border: 1px solid #333;">
+                    <div style="font-size: 14px; color: #888;">Attendance</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #10b981; margin-top: 5px;">92%</div>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Excellent Record</p>
+                </div>
+                <div class="stat-card"
+                    style="background: #1e1e1e; padding: 20px; border-radius: 12px; border: 1px solid #333;">
+                    <div style="font-size: 14px; color: #888;">CGPA</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #8b5cf6; margin-top: 5px;">9.4</div>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Top 5% of Class</p>
+                </div>
+                <div class="stat-card"
+                    style="background: #1e1e1e; padding: 20px; border-radius: 12px; border: 1px solid #333;">
+                    <div style="font-size: 14px; color: #888;">Credits Earned</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #f59e0b; margin-top: 5px;">18/24</div>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">On Track</p>
+                </div>
+            </div>
+
+            <h3 style="font-size: 18px; margin-bottom: 20px; color: #ccc;">Recent Grades</h3>
+            <table style="width: 100%; border-collapse: collapse; color: #ddd; font-size: 14px;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #333; text-align: left;">
+                        <th style="padding: 10px;">Subject</th>
+                        <th style="padding: 10px;">Type</th>
+                        <th style="padding: 10px;">Grade</th>
+                        <th style="padding: 10px;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 12px 10px;">Advanced Algorithms</td>
+                        <td style="padding: 12px 10px;">Mid-Term</td>
+                        <td style="padding: 12px 10px;"><span style="color: #10b981;">A</span></td>
+                        <td style="padding: 12px 10px; color: #888;">Oct 15</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 12px 10px;">System Design</td>
+                        <td style="padding: 12px 10px;">Project</td>
+                        <td style="padding: 12px 10px;"><span style="color: #8b5cf6;">A+</span></td>
+                        <td style="padding: 12px 10px; color: #888;">Oct 10</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 12px 10px;">Cyber Security</td>
+                        <td style="padding: 12px 10px;">Quiz</td>
+                        <td style="padding: 12px 10px;"><span style="color: #f59e0b;">B+</span></td>
+                        <td style="padding: 12px 10px; color: #888;">Oct 05</td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
     </main>

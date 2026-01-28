@@ -10,14 +10,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Set User Profile (Mock)
+    // Set User Profile
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    // You could update UI with user.name here if you had an ID for it
+
+    if (user.name) {
+        const nameEl = document.querySelector('.profile-info h3');
+        const roleEl = document.querySelector('.profile-info span');
+        const avatarEl = document.querySelector('.avatar');
+
+        if (nameEl) nameEl.textContent = user.name;
+        if (roleEl) roleEl.textContent = user.role === 'teacher' ? 'Faculty Member' : 'Student Account';
+        if (avatarEl) avatarEl.textContent = user.name.substring(0, 2).toUpperCase();
+
+        // Background color for avatar based on role
+        if (user.role === 'teacher' && avatarEl) avatarEl.style.background = 'var(--accent-blue)';
+    }
+
+    // Role-Based Sidebar Navigation
+    if (user.role === 'student') {
+        ['students', 'courses'].forEach(sec => {
+            const link = document.querySelector(`.nav-link[data-section="${sec}"]`);
+            if (link) link.style.display = 'none';
+        });
+    }
 
     initNavigation();
     initUpload();
     initForms();
-    loadStudents();
+    if (user.role !== 'student') loadStudents(); // Only load heavy data for teachers
 
     // Sign Out Handler
     const signOutBtn = document.querySelector('.fa-arrow-right-from-bracket').parentNode;
