@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../Frontend')));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const os = require('os');
@@ -135,12 +135,12 @@ app.post('/api/auth/google', async (req, res) => {
 app.get('/', (req, res) => {
     // Note: In a real app, we might check cookies here or handle it client-side.
     // We'll let client-side JS handle the redirect to login.html if token missing.
-    res.sendFile(path.join(__dirname, '../Frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
 // Serve Login Page
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Frontend', 'login.html'));
+    res.sendFile(path.join(__dirname, '../public', 'login.html'));
 });
 
 // ===============================
