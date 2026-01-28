@@ -20,10 +20,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../Frontend')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, 'uploads');
+const os = require('os');
+
+// Ensure uploads directory exists (Use /tmp in production/serverless)
+const uploadsDir = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, 'uploads');
+
 if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+    // try/catch for read-only filesystem issues
+    try {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+    } catch (e) {
+        console.log('Uploads dir creation skipped (likely read-only fs)');
+    }
 }
 
 // Multer configuration for file uploads
