@@ -245,6 +245,26 @@
 
     <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 2000;"></div>
 
+    <!-- CHATBOT WIDGET -->
+    <button id="chat-fab" class="btn-chat-fab">
+        <i class="fa-solid fa-robot"></i>
+    </button>
+
+    <div id="chat-window" class="chat-window hidden">
+        <div class="chat-header">
+            <span>🤖 CampusBot (Gemini Pro)</span>
+            <button onclick="toggleChat()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg bot">Hello! I'm capable of advanced reasoning. How can I help? 🧠</div>
+        </div>
+        <div class="chat-input-area">
+            <button id="mic-btn" class="btn-icon-small"><i class="fa-solid fa-microphone"></i></button>
+            <input type="text" id="chat-input" placeholder="Type or speak...">
+            <button id="send-btn" class="btn-icon-small"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
 </body>
 

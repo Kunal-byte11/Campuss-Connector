@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Import services and models
 const driveService = require('./services/driveService');
-const aiClassifier = require('../AI/aiClassifier');
+const aiClassifier = require('./AI/aiClassifier');
 const Student = require('./models/Student');
 
 const app = express();

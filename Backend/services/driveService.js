@@ -40,8 +40,26 @@ class DriveService {
             });
             console.log('✅ Access confirmed to Google Drive Folder:', this.parentFolderId);
         } catch (error) {
-            console.error('❌ ACCESS DENIED to Google Drive Folder:', this.parentFolderId);
-            console.error('👉 ACTION REQUIRED: Share this folder with:', require('../config/service-account.json').client_email);
+            console.error('❌ GOOGLE DRIVE CONNECTION FAILED');
+            console.error('   Error Code:', error.code);
+            console.error('   Error Message:', error.message);
+            console.error('   Folder ID:', this.parentFolderId);
+
+            if (error.code === 404) {
+                console.error('👉 CAUSE: Folder ID not found. Check GOOGLE_DRIVE_PARENT_FOLDER_ID in .env');
+            } else if (error.code === 403) {
+                let email = 'SERVICE_ACCOUNT_EMAIL';
+                try {
+                    const creds = require('../config/service-account.json');
+                    email = creds.client_email;
+                } catch (e) {
+                    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+                        try { email = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON).client_email; } catch (err) { }
+                    }
+                }
+                console.error(`👉 CAUSE: Permission Denied. You must SHARE the folder with: ${email}`);
+            }
+
             console.error('⚠️  Switching to MOCK MODE to prevent crashes.\n');
             this.isMockMode = true;
             this.setupMockStorage();
@@ -195,32 +213,44 @@ class DriveService {
         };
 
         try {
+            // 1. Upload the File
             const response = await drive.files.create({
                 resource: fileMetadata,
                 media: media,
                 fields: 'id, name, webViewLink, webContentLink'
             });
 
-            await drive.permissions.create({
-                fileId: response.data.id,
-                requestBody: { role: 'reader', type: 'anyone' }
-            });
+            const fileId = response.data.id;
+            // console.log('✅ File uploaded to Drive:', fileId);
 
+            // 2. Try to make it public (Reader)
+            try {
+                await drive.permissions.create({
+                    fileId: fileId,
+                    requestBody: { role: 'reader', type: 'anyone' }
+                });
+            } catch (permError) {
+                console.warn(`⚠️ Warning: Could not set public permissions (likely Org restricted). File is still safe in Drive. ID: ${fileId}`);
+            }
+
+            // 3. Get Final Links
             const file = await drive.files.get({
-                fileId: response.data.id,
+                fileId: fileId,
                 fields: 'webViewLink, webContentLink'
             });
 
-            fs.unlinkSync(filePath);
+            fs.unlinkSync(filePath); // Delete local temp file
 
             return {
-                fileId: response.data.id,
+                fileId: fileId,
                 fileName: response.data.name,
                 shareableLink: file.data.webViewLink,
                 downloadLink: file.data.webContentLink
             };
+
         } catch (error) {
-            console.error('Error uploading file (Simulating Success in Mock Mode):', error.message);
+            console.error('❌ Critical Upload Error:', error.message);
+            console.error('   Switching to Mock Mode for this upload.');
             return this.uploadToMock(filePath, fileName);
         }
     }

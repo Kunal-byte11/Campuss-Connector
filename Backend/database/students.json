@@ -66,6 +66,14 @@
             "downloadLink": "/uploads/mock_drive/1769578854413-First year - converted - converted - converted.pdf",
             "fileId": "mock-file-1769578854452",
             "uploadedAt": "2026-01-28T05:40:54.454Z"
+          },
+          {
+            "id": "6e9bb769-20b4-4b62-966e-5a0149fcd9fa",
+            "fileName": "First year - converted - converted.pdf",
+            "shareableLink": "/uploads/mock_drive/1769582153723-First year - converted - converted.pdf",
+            "downloadLink": "/uploads/mock_drive/1769582153723-First year - converted - converted.pdf",
+            "fileId": "mock-file-1769582153731",
+            "uploadedAt": "2026-01-28T06:35:53.732Z"
           }
         ],
         "idCardLinks": [],
@@ -74,7 +82,7 @@
       },
       "driveFolderId": "1N1J2KT0SWRSXtWW7actM1LC1MYhDivWX",
       "createdAt": "2026-01-28T05:00:00.000Z",
-      "updatedAt": "2026-01-28T05:40:54.455Z"
+      "updatedAt": "2026-01-28T06:35:53.733Z"
     },
     {
       "id": "demo-003",
@@ -84,14 +92,23 @@
       "email": "amit.kumar@college.edu",
       "phone": "9876543212",
       "documents": {
-        "assignmentLinks": [],
+        "assignmentLinks": [
+          {
+            "id": "6f83f097-3020-416b-b08a-b3b9e0d77d97",
+            "fileName": "Room Agreement_compressed.pdf",
+            "shareableLink": "/uploads/mock_drive/1769583560179-Room Agreement_compressed.pdf",
+            "downloadLink": "/uploads/mock_drive/1769583560179-Room Agreement_compressed.pdf",
+            "fileId": "mock-file-1769583560185",
+            "uploadedAt": "2026-01-28T06:59:20.186Z"
+          }
+        ],
         "idCardLinks": [],
         "certificateLinks": [],
         "feeReceiptLinks": []
       },
-      "driveFolderId": null,
+      "driveFolderId": "1EEA6Sk4FylXaYlrkpCwDKfm_MYnz1Y1w",
       "createdAt": "2026-01-28T05:00:00.000Z",
-      "updatedAt": "2026-01-28T05:00:00.000Z"
+      "updatedAt": "2026-01-28T06:59:20.186Z"
     }
   ]
 }

@@ -139,7 +139,8 @@ class AIClassifier {
 
             EXAMPLES:
             - "ST102_Math_HW.pdf", folderExists=true -> STORE: ST102 → assignment
-            - "Fee_Receipt_Jan.pdf", ID="ST105", folderExists=false -> CREATE_FOLDER: ST105\nTHEN_STORE: feeReceipt
+            - "Fee_Receipt_Jan.pdf", ID="ST105", folderExists=false -> CREATE_FOLDER: ST105
+            THEN_STORE: feeReceipt
             
             Do not provide explanations. Only return the string format.
             `;
@@ -164,7 +165,8 @@ class AIClassifier {
             }
 
             if (!folderExists) {
-                return `CREATE_FOLDER: ${studentId}\nTHEN_STORE: ${fallbackDocType}`;
+                return `CREATE_FOLDER: ${studentId}
+THEN_STORE: ${fallbackDocType}`;
             }
 
             return `STORE: ${studentId} → ${fallbackDocType}`;
@@ -213,24 +215,35 @@ class AIClassifier {
      */
     async chat(message) {
         try {
-            if (!process.env.GEMINI_API_KEY) throw new Error('No API Key');
+            if (!process.env.GEMINI_API_KEY) {
+                console.error('❌ FATAL: GEMINI_API_KEY is missing in process.env!');
+                throw new Error('API Key Missing');
+            }
 
             const { GoogleGenerativeAI } = require("@google/generative-ai");
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+            // Using Flash for stability
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
             const prompt = `
-            You are "CampusBot", a helpful assistant for the College Management System.
-            Keep answers short (under 50 words) and friendly.
+            You are "CampusBot", an intelligent and helpful AI assistant for the College Management System.
             User: ${message}
             Bot:
             `;
 
+            console.log(`🤖 CampusBot Request: ${message}`);
             const result = await model.generateContent(prompt);
-            return result.response.text();
+            const response = await result.response;
+            const text = response.text();
+
+            console.log('✅ CampusBot Reply:', text);
+            return text;
+
         } catch (error) {
-            console.error('Chat Error:', error);
-            return "I'm having trouble connecting to my brain right now.";
+            console.error('❌ Chat Function Error:', error);
+            if (error.message.includes('API Key')) return "My connection key is missing. Please check .env.";
+            return "I'm having trouble connecting to my brain. (Check Server Logs)";
         }
     }
 }

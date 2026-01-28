@@ -15,6 +15,7 @@
     "google-auth-library": "^10.5.0",
     "googleapis": "^129.0.0",
     "multer": "^1.4.5-lts.1",
+    "openai": "^6.16.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
