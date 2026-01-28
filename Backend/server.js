@@ -143,6 +143,12 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'login.html'));
 });
 
+app.post('/api/chat', async (req, res) => {
+    const { message } = req.body;
+    const response = await aiClassifier.chat(message);
+    res.json({ reply: response });
+});
+
 // ===============================
 // FILE UPLOAD ROUTE (MAIN)
 // ===============================

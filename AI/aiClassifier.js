@@ -207,6 +207,32 @@ class AIClassifier {
 
         return result;
     }
+
+    /**
+     * General Chat Method
+     */
+    async chat(message) {
+        try {
+            if (!process.env.GEMINI_API_KEY) throw new Error('No API Key');
+
+            const { GoogleGenerativeAI } = require("@google/generative-ai");
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const prompt = `
+            You are "CampusBot", a helpful assistant for the College Management System.
+            Keep answers short (under 50 words) and friendly.
+            User: ${message}
+            Bot:
+            `;
+
+            const result = await model.generateContent(prompt);
+            return result.response.text();
+        } catch (error) {
+            console.error('Chat Error:', error);
+            return "I'm having trouble connecting to my brain right now.";
+        }
+    }
 }
 
 module.exports = new AIClassifier();

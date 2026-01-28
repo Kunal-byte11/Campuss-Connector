@@ -352,3 +352,126 @@ function showToast(message, type = 'info') {
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
+
+// =======================
+// CHATBOT & VOICE LOGIC
+// =======================
+
+function initChat() {
+    const fab = document.getElementById('chat-fab');
+    const windowEl = document.getElementById('chat-window');
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const micBtn = document.getElementById('mic-btn');
+    const msgs = document.getElementById('chat-messages');
+
+    if (!fab) return;
+
+    // Toggle Window
+    fab.addEventListener('click', toggleChat);
+
+    // Send Message
+    sendBtn.addEventListener('click', () => sendMessage());
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Voice Recognition (Web Speech API)
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        micBtn.addEventListener('click', () => {
+            if (micBtn.classList.contains('mic-active')) {
+                recognition.stop();
+            } else {
+                recognition.start();
+                micBtn.classList.add('mic-active');
+            }
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            input.value = transcript;
+            micBtn.classList.remove('mic-active');
+            sendMessage(); // Auto-send on voice
+        };
+
+        recognition.onerror = () => {
+            micBtn.classList.remove('mic-active');
+        };
+
+        recognition.onend = () => {
+            micBtn.classList.remove('mic-active');
+        };
+    } else {
+        micBtn.style.display = 'none'; // Not supported
+    }
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        // User Msg
+        appendMsg(text, 'user');
+        input.value = '';
+
+        // Bot Thinking
+        const loadingId = appendMsg('...', 'bot');
+
+        try {
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await res.json();
+
+            // Remove loading
+            document.getElementById(loadingId).remove();
+
+            // Bot Msg
+            appendMsg(data.reply, 'bot');
+            speak(data.reply);
+
+        } catch (err) {
+            console.error(err);
+            const loadingEl = document.getElementById(loadingId);
+            if (loadingEl) loadingEl.innerText = 'Error connecting.';
+        }
+    }
+
+    function appendMsg(text, sender) {
+        const id = 'msg-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = `chat-msg ${sender}`;
+        div.innerText = text;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+        return id;
+    }
+
+    function speak(text) {
+        // Clean text (remove formatting like * or #)
+        const cleanText = text.replace(/[*#]/g, '');
+        const synth = window.speechSynthesis;
+        if (synth.speaking) synth.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.pitch = 1;
+        utterance.rate = 1;
+        synth.speak(utterance);
+    }
+}
+
+function toggleChat() {
+    const w = document.getElementById('chat-window');
+    w.classList.toggle('hidden');
+}
+
+// Auto-init chat
+initChat();
