@@ -143,12 +143,71 @@
             <div class="error-msg" id="error-msg"></div>
         </form>
 
+        <div style="text-align: center; margin: 20px 0; position: relative;">
+            <hr style="border: 0; border-top: 1px solid #333;">
+            <span
+                style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #1e1e1e; padding: 0 10px; color: #666; font-size: 12px;">OR</span>
+        </div>
+
+        <!-- Google Sign-In Container -->
+        <div id="g_id_onload" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+            data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
+            data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="320">
+        </div>
+
         <div style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">
             Demo: admin / admin123
         </div>
     </div>
 
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <script>
+        // Fetch Client ID and Init Google Auth
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(data => {
+                const clientId = data.googleClientId;
+                if (clientId) {
+                    const div = document.getElementById('g_id_onload');
+                    div.setAttribute('data-client_id', clientId);
+                } else {
+                    console.warn('Google Client ID not found in config');
+                }
+            })
+            .catch(err => console.error('Failed to load config', err));
+
+        // Handle Google Response
+        async function handleCredentialResponse(response) {
+            const errorDiv = document.getElementById('error-msg');
+            errorDiv.textContent = 'Verifying with server...';
+
+            try {
+                const res = await fetch('/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/';
+                } else {
+                    errorDiv.textContent = data.error || 'Authentication failed';
+                }
+            } catch (err) {
+                console.error(err);
+                errorDiv.textContent = 'Connection error during Google Auth';
+            }
+        }
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;

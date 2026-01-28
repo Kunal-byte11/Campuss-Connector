@@ -68,6 +68,10 @@ const upload = multer({
 // AUTH ROUTES
 // ===============================
 
+app.get('/api/config', (req, res) => {
+    res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || '' });
+});
+
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -81,6 +85,41 @@ app.post('/api/login', (req, res) => {
         });
     } else {
         res.status(401).json({ error: 'Invalid credentials' });
+    }
+});
+
+app.post('/api/auth/google', async (req, res) => {
+    const { credential } = req.body;
+    const { OAuth2Client } = require('google-auth-library');
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        const payload = ticket.getPayload();
+
+        // STRICT DOMAIN CHECK: @ltce.in
+        if (payload.hd !== 'ltce.in') {
+            return res.status(403).json({ error: 'Access restricted to @ltce.in emails only' });
+        }
+
+        const token = 'google-session-' + Date.now();
+        res.json({
+            success: true,
+            token,
+            user: {
+                name: payload.name,
+                email: payload.email,
+                avatar: payload.picture,
+                role: 'student' // Default role
+            }
+        });
+
+    } catch (error) {
+        console.error('Google Auth Error:', error);
+        res.status(401).json({ error: 'Google authentication failed' });
     }
 });
 
