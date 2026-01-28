@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Import services and models
 const driveService = require('./services/driveService');
-const aiClassifier = require('./services/aiClassifier');
+const aiClassifier = require('../AI/aiClassifier');
 const Student = require('./models/Student');
 
 const app = express();
@@ -17,7 +17,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../Frontend')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -65,7 +66,7 @@ const upload = multer({
 
 // Serve main page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '../Frontend', 'index.html'));
 });
 
 // ===============================

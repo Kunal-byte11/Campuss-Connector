@@ -21,7 +21,7 @@ class DriveService {
     }
 
     setupMockStorage() {
-        this.mockStoragePath = path.join(__dirname, '../public/uploads/mock_drive');
+        this.mockStoragePath = path.join(__dirname, '../uploads/mock_drive');
         if (!fs.existsSync(this.mockStoragePath)) {
             fs.mkdirSync(this.mockStoragePath, { recursive: true });
         }
