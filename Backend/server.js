@@ -64,9 +64,36 @@ const upload = multer({
 // ROUTES
 // ===============================
 
-// Serve main page
+// ===============================
+// AUTH ROUTES
+// ===============================
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Simple Hardcoded Auth (Demo Purpose)
+    if (username === 'admin' && password === 'admin123') {
+        const token = 'mock-jwt-token-' + Date.now();
+        res.json({
+            success: true,
+            token,
+            user: { name: 'Admin User', email: 'admin@college.edu', role: 'admin' }
+        });
+    } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+    }
+});
+
+// Serve main page (Protected View)
 app.get('/', (req, res) => {
+    // Note: In a real app, we might check cookies here or handle it client-side.
+    // We'll let client-side JS handle the redirect to login.html if token missing.
     res.sendFile(path.join(__dirname, '../Frontend', 'index.html'));
+});
+
+// Serve Login Page
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend', 'login.html'));
 });
 
 // ===============================

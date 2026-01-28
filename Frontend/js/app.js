@@ -3,10 +3,32 @@ let students = [];
 let selectedFile = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Auth Check
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    // Set User Profile (Mock)
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    // You could update UI with user.name here if you had an ID for it
+
     initNavigation();
     initUpload();
     initForms();
     loadStudents();
+
+    // Sign Out Handler
+    const signOutBtn = document.querySelector('.fa-arrow-right-from-bracket').parentNode;
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        });
+    }
 });
 
 function initNavigation() {
